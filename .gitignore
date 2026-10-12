@@ -1,0 +1,12 @@
+# Never commit secrets or private keys
+.env
+.env.*
+!.env.example
+secrets.json
+secrets.*.json
+credentials.json
+*.pem
+*.key
+id_rsa*
+*.p12
+*.pfx

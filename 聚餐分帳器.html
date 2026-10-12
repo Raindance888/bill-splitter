@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17324d">
+  <title>聚餐分帳器</title>
+  <style>
+    :root {
+      --ink: #17324d;
+      --muted: #66768a;
+      --line: #dce5ee;
+      --panel: #ffffff;
+      --bg: #eef3f8;
+      --accent: #e86f51;
+      --accent-dark: #c9583c;
+      --accent-soft: #fff0eb;
+      --blue-soft: #edf6ff;
+      --success: #18794e;
+      --shadow: 0 16px 44px rgba(24, 50, 77, 0.10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 0%, rgba(255,255,255,.95) 0, rgba(255,255,255,0) 30%),
+        var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      line-height: 1.5;
+    }
+
+    .wrap {
+      width: min(960px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 42px 0 32px;
+    }
+
+    .hero {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin: 0 0 10px;
+      color: var(--accent-dark);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .14em;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(232,111,81,.12);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      line-height: 1.08;
+      letter-spacing: -.04em;
+    }
+
+    .lead {
+      max-width: 590px;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .offline-badge {
+      flex: 0 0 auto;
+      padding: 9px 13px;
+      border: 1px solid #cfe6d9;
+      border-radius: 999px;
+      color: var(--success);
+      background: #f2fbf6;
+      font-size: .84rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .card {
+      border: 1px solid rgba(220,229,238,.9);
+      border-radius: 24px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .form-card {
+      padding: clamp(20px, 4vw, 34px);
+    }
+
+    .section-title {
+      margin: 0 0 19px;
+      font-size: 1.15rem;
+      letter-spacing: -.02em;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(150px, .65fr);
+      gap: 16px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: .9rem;
+      font-weight: 750;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap .prefix {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-weight: 700;
+      pointer-events: none;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      min-height: 52px;
+      padding: 11px 15px;
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      color: var(--ink);
+      background: #fbfdff;
+      font: inherit;
+      font-size: 1.08rem;
+      font-weight: 700;
+      outline: none;
+      transition: border-color .18s, box-shadow .18s, background .18s;
+    }
+
+    input[type="number"]#total { padding-left: 37px; }
+
+    input[type="number"]:focus {
+      border-color: var(--accent);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(232,111,81,.14);
+    }
+
+    .service-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 18px;
+      padding: 15px 16px;
+      border: 1px solid #e2ebf3;
+      border-radius: 15px;
+      background: #f8fbfe;
+    }
+
+    .service-copy strong,
+    .service-copy span { display: block; }
+    .service-copy strong { font-size: .96rem; }
+    .service-copy span { margin-top: 2px; color: var(--muted); font-size: .82rem; }
+
+    .switch {
+      position: relative;
+      flex: 0 0 auto;
+      width: 52px;
+      height: 30px;
+    }
+
+    .switch input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      cursor: pointer;
+      border-radius: 999px;
+      background: #c6d3df;
+      transition: background .18s;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      left: 4px;
+      top: 4px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,.17);
+      transition: transform .18s;
+    }
+
+    .switch input:checked + .slider { background: var(--accent); }
+    .switch input:checked + .slider::before { transform: translateX(22px); }
+    .switch input:focus-visible + .slider { outline: 3px solid rgba(232,111,81,.25); outline-offset: 3px; }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    button {
+      min-height: 50px;
+      border: 0;
+      border-radius: 14px;
+      padding: 0 22px;
+      color: #fff;
+      background: var(--accent);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(232,111,81,.22);
+      transition: transform .15s, background .15s, box-shadow .15s;
+    }
+
+    button:hover { background: var(--accent-dark); box-shadow: 0 10px 20px rgba(232,111,81,.28); }
+    button:active { transform: translateY(1px); }
+    button.secondary {
+      color: var(--ink);
+      background: transparent;
+      box-shadow: none;
+    }
+    button.secondary:hover { background: #f1f5f8; }
+
+    .error {
+      min-height: 1.5em;
+      margin: 12px 0 0;
+      color: #bd3b2c;
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    .results {
+      margin-top: 22px;
+      overflow: hidden;
+    }
+
+    .results-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      padding: clamp(22px, 4vw, 32px) clamp(20px, 4vw, 34px) 22px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .results-head h2 { margin: 0; font-size: 1.25rem; }
+    .results-head p { margin: 6px 0 0; color: var(--muted); font-size: .9rem; }
+
+    .total-box { text-align: right; }
+    .total-box small { display: block; color: var(--muted); font-weight: 700; }
+    .total-box strong { display: block; margin-top: 1px; font-size: clamp(1.7rem, 4vw, 2.3rem); letter-spacing: -.04em; }
+
+    .breakdown {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px 24px;
+      padding: 15px clamp(20px, 4vw, 34px);
+      color: var(--muted);
+      background: #f8fbfe;
+      font-size: .88rem;
+    }
+    .breakdown b { color: var(--ink); }
+
+    .people {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding: 22px clamp(20px, 4vw, 34px) 28px;
+    }
+
+    .person {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 74px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    .person.payer {
+      border-color: #f4c8bc;
+      background: var(--accent-soft);
+    }
+
+    .person-label { min-width: 0; }
+    .person-label strong { display: block; font-size: .98rem; }
+    .person-label span { display: block; margin-top: 2px; color: var(--muted); font-size: .78rem; }
+    .person-amount { flex: 0 0 auto; font-size: 1.35rem; font-weight: 850; letter-spacing: -.03em; }
+    .person-amount small { margin-left: 2px; font-size: .82rem; font-weight: 750; }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 clamp(20px, 4vw, 34px) 25px;
+      padding: 13px 15px;
+      border-radius: 13px;
+      color: var(--success);
+      background: #f0faf5;
+      font-size: .9rem;
+      font-weight: 750;
+    }
+    .check::before { content: "✓"; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: #c9ecd9; font-size: .78rem; }
+
+    .note {
+      margin: 18px 0 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: .82rem;
+    }
+
+    @media (max-width: 640px) {
+      .wrap { width: min(100% - 20px, 560px); padding-top: 25px; }
+      .hero { display: block; }
+      .offline-badge { display: inline-flex; margin-top: 18px; }
+      .fields { grid-template-columns: 1fr; gap: 14px; }
+      .actions { flex-direction: column; align-items: stretch; }
+      button { width: 100%; }
+      .results-head { align-items: flex-start; flex-direction: column; gap: 14px; }
+      .total-box { text-align: left; }
+      .people { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">聚餐後快速結算</p>
+        <h1 id="page-title">聚餐分帳器</h1>
+        <p class="lead">輸入這餐的金額與人數，零頭會自動算在負責付錢的人身上，讓大家加總後剛剛好。</p>
+      </div>
+      <div class="offline-badge">● 完全離線使用</div>
+    </section>
+
+    <form id="bill-form" class="card form-card" novalidate>
+      <h2 class="section-title">這餐怎麼算？</h2>
+      <div class="fields">
+        <div class="field">
+          <label for="total">總金額</label>
+          <div class="input-wrap">
+            <span class="prefix">NT$</span>
+            <input id="total" name="total" type="number" inputmode="numeric" min="0" step="1" value="1000" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="people">人數</label>
+          <input id="people" name="people" type="number" inputmode="numeric" min="1" step="1" value="3" required>
+        </div>
+      </div>
+
+      <div class="service-row">
+        <div class="service-copy">
+          <strong>加 10% 服務費</strong>
+          <span>服務費會加入大家要分攤的總額</span>
+        </div>
+        <label class="switch" aria-label="是否加 10% 服務費">
+          <input id="service" name="service" type="checkbox">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button type="submit">開始分帳</button>
+        <button id="reset" class="secondary" type="button">清除重填</button>
+      </div>
+      <p id="error" class="error" role="alert" aria-live="polite"></p>
+    </form>
+
+    <section id="results" class="card results" aria-labelledby="results-title" aria-live="polite">
+      <div class="results-head">
+        <div>
+          <h2 id="results-title">每個人要給多少？</h2>
+          <p id="result-subtitle">已把零頭分配給負責付錢的人</p>
+        </div>
+        <div class="total-box">
+          <small>應收總額</small>
+          <strong id="grand-total">NT$ 1,000</strong>
+        </div>
+      </div>
+      <div id="breakdown" class="breakdown"></div>
+      <div id="people-list" class="people"></div>
+      <div id="check" class="check"></div>
+    </section>
+
+    <p class="note">不連網、不登入、不儲存任何人的資料；關閉頁面後，這次輸入就會消失。</p>
+  </main>
+
+  <script>
+    (() => {
+      const form = document.querySelector('#bill-form');
+      const totalInput = document.querySelector('#total');
+      const peopleInput = document.querySelector('#people');
+      const serviceInput = document.querySelector('#service');
+      const resetButton = document.querySelector('#reset');
+      const error = document.querySelector('#error');
+      const grandTotal = document.querySelector('#grand-total');
+      const breakdown = document.querySelector('#breakdown');
+      const peopleList = document.querySelector('#people-list');
+      const check = document.querySelector('#check');
+      const number = new Intl.NumberFormat('zh-TW');
+
+      const money = (value) => `NT$ ${number.format(value)}`;
+
+      function getValues() {
+        const total = Number(totalInput.value);
+        const people = Number(peopleInput.value);
+        if (!Number.isFinite(total) || !Number.isInteger(total) || total < 0) {
+          throw new Error('請輸入 0 元以上的整數總金額。');
+        }
+        if (!Number.isFinite(people) || !Number.isInteger(people) || people < 1) {
+          throw new Error('請輸入至少 1 人。');
+        }
+        return { total, people, includeService: serviceInput.checked };
+      }
+
+      function calculate({ total, people, includeService }) {
+        const serviceFee = includeService ? Math.round(total * 0.1) : 0;
+        const grand = total + serviceFee;
+        const each = Math.floor(grand / people);
+        const remainder = grand % people;
+        const amounts = Array.from({ length: people }, (_, index) => each + (index === 0 ? remainder : 0));
+        return { total, serviceFee, grand, each, remainder, amounts };
+      }
+
+      function render() {
+        error.textContent = '';
+        try {
+          const result = calculate(getValues());
+          grandTotal.textContent = money(result.grand);
+          breakdown.innerHTML = `
+            <span>原始金額 <b>${money(result.total)}</b></span>
+            <span>服務費 <b>${money(result.serviceFee)}</b></span>
+            <span>每人基本額 <b>${money(result.each)}</b></span>
+          `;
+
+          peopleList.innerHTML = result.amounts.map((amount, index) => {
+            const isPayer = index === 0;
+            const extra = isPayer && result.remainder > 0 ? `多負擔 ${money(result.remainder)} 零頭` : '平均分攤';
+            return `
+              <div class="person${isPayer ? ' payer' : ''}">
+                <div class="person-label">
+                  <strong>${isPayer ? '付錢的人' : `第 ${index + 1} 人`}</strong>
+                  <span>${extra}</span>
+                </div>
+                <div class="person-amount">${money(amount)}</div>
+              </div>
+            `;
+          }).join('');
+
+          const addition = result.amounts.join(' + ');
+          check.textContent = `核對：${addition} = ${number.format(result.grand)} 元，剛好對上。`;
+        } catch (message) {
+          error.textContent = message.message;
+        }
+      }
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        render();
+      });
+
+      [totalInput, peopleInput, serviceInput].forEach((input) => {
+        input.addEventListener('change', render);
+      });
+
+      resetButton.addEventListener('click', () => {
+        totalInput.value = '';
+        peopleInput.value = '';
+        serviceInput.checked = false;
+        error.textContent = '';
+        grandTotal.textContent = 'NT$ —';
+        breakdown.innerHTML = '';
+        peopleList.innerHTML = '<div class="person"><div class="person-label"><strong>等待輸入</strong><span>填好上方資料後開始分帳</span></div><div class="person-amount">—</div></div>';
+        check.textContent = '輸入資料後，這裡會幫你核對總和。';
+        totalInput.focus();
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>
